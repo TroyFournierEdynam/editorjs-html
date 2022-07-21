@@ -1,10 +1,11 @@
 import { OutputData } from "@editorjs/editorjs";
 import transforms, { block } from "./transforms";
 import { ParseFunctionError } from "./errors";
+import { each } from 'bluebird'
 
 type parser = {
   parse(OutputData: OutputData): Array<string>;
-  parseAsync(OutputData: OutputData): Promise<Array<any>>;
+  parseAsync(OutputData: OutputData): Promise<string[]>;
   parseStrict(OutputData: OutputData): Array<string> | Error;
   parseBlock(block: block): string;
   validate(OutputData: OutputData): Array<string>;
@@ -23,12 +24,25 @@ const parser = (plugins = {}): parser => {
     },
 
     parseAsync: async ({ blocks }) => {
-      return blocks.map(async (block) => {
+      const mappedBlocks = blocks.map((block) => {
         return parsers[block.type]
-          ? await parsers[block.type](block)
+          ? parsers[block.type](block)
           : ParseFunctionError(block.type);
+      })
+      return await each(mappedBlocks, async function (block) {
+        return String(parsers[block.type]
+          ? (await parsers[block.type](block))
+          : ParseFunctionError(block.type));
       });
     },
+
+    // parseAsync: async ({ blocks }) => {
+    //   return blocks.map(async (block) => {
+    //     return String(parsers[block.type]
+    //       ? (await parsers[block.type](block))
+    //       : ParseFunctionError(block.type));
+    //   });
+    // },
 
     parseBlock: (block) => {
       return parsers[block.type]
@@ -71,3 +85,7 @@ const parser = (plugins = {}): parser => {
 };
 
 export default parser;
+function use(parsers: typeof transforms): any {
+  throw new Error("Function not implemented.");
+}
+
