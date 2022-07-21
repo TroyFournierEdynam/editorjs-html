@@ -4,7 +4,7 @@ import { ParseFunctionError } from "./errors";
 
 type parser = {
   parse(OutputData: OutputData): Array<string>;
-  parseAsync(OutputData: OutputData): Array<any>;
+  parseAsync(OutputData: OutputData): Promise<Array<any>>;
   parseStrict(OutputData: OutputData): Array<string> | Error;
   parseBlock(block: block): string;
   validate(OutputData: OutputData): Array<string>;
@@ -22,7 +22,7 @@ const parser = (plugins = {}): parser => {
       });
     },
 
-    parseAsync: ({ blocks }) => {
+    parseAsync: async ({ blocks }) => {
       return blocks.map(async (block) => {
         return parsers[block.type]
           ? await parsers[block.type](block)
