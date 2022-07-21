@@ -25,25 +25,11 @@ const parser = (plugins = {}): parser => {
 
     parseAsync: async ({ blocks }) => {
       return await Promise.all(blocks.map(async (block) => {
-        return String(parsers[block.type]
+        return parsers[block.type]
           ? (await parsers[block.type](block))
-          : ParseFunctionError(block.type));
+          : ParseFunctionError(block.type);
       }));
-      const tmp = await each(blocks, async function (block) {
-        return String(parsers[block.type]
-          ? (await parsers[block.type](block))
-          : ParseFunctionError(block.type));
-      });
-
     },
-
-    // parseAsync: async ({ blocks }) => {
-    //   return blocks.map(async (block) => {
-    //     return String(parsers[block.type]
-    //       ? (await parsers[block.type](block))
-    //       : ParseFunctionError(block.type));
-    //   });
-    // },
 
     parseBlock: (block) => {
       return parsers[block.type]
