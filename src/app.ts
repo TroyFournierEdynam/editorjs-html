@@ -24,16 +24,17 @@ const parser = (plugins = {}): parser => {
     },
 
     parseAsync: async ({ blocks }) => {
-      const mappedBlocks = blocks.map((block) => {
-        return parsers[block.type]
-          ? parsers[block.type](block)
-          : ParseFunctionError(block.type);
-      })
-      return await each(mappedBlocks, async function (block) {
+      return await Promise.all(blocks.map(async (block) => {
+        return String(parsers[block.type]
+          ? (await parsers[block.type](block))
+          : ParseFunctionError(block.type));
+      }));
+      const tmp = await each(blocks, async function (block) {
         return String(parsers[block.type]
           ? (await parsers[block.type](block))
           : ParseFunctionError(block.type));
       });
+
     },
 
     // parseAsync: async ({ blocks }) => {
