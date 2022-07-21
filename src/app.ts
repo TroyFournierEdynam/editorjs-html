@@ -1,7 +1,6 @@
 import { OutputData } from "@editorjs/editorjs";
 import transforms, { block } from "./transforms";
 import { ParseFunctionError } from "./errors";
-import { each } from 'bluebird'
 
 type parser = {
   parse(OutputData: OutputData): Array<string>;
