@@ -4,7 +4,7 @@ import { ParseFunctionError } from "./errors";
 
 type parser = {
   parse(OutputData: OutputData): Array<string>;
-  parseAsync(OutputData: OutputData): Promise<Array<string>>;
+  parseAsync(OutputData: OutputData): Promise<Array<any>>;
   parseStrict(OutputData: OutputData): Array<string> | Error;
   parseBlock(block: block): string;
   validate(OutputData: OutputData): Array<string>;
