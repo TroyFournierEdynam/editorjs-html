@@ -1,6 +1,7 @@
 import { OutputData } from "@editorjs/editorjs";
 import transforms, { block } from "./transforms";
 import { ParseFunctionError } from "./errors";
+import { Promise as BluebirdPromise } from 'bluebird'
 
 type parser = {
   parse(OutputData: OutputData): Array<string>;
@@ -23,11 +24,11 @@ const parser = (plugins = {}): parser => {
     },
 
     parseAsync: async ({ blocks }) => {
-      return await Promise.all(blocks.map(async (block) => {
+      return await BluebirdPromise.map(blocks, async (block) => {
         return parsers[block.type]
           ? (await parsers[block.type](block))
           : ParseFunctionError(block.type);
-      }));
+      });
     },
 
     parseBlock: (block) => {
@@ -71,7 +72,3 @@ const parser = (plugins = {}): parser => {
 };
 
 export default parser;
-function use(parsers: typeof transforms): any {
-  throw new Error("Function not implemented.");
-}
-
