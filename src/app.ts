@@ -3,9 +3,13 @@ import transforms, { block } from "./transforms";
 import { ParseFunctionError } from "./errors";
 import { Promise as BluebirdPromise } from 'bluebird'
 
+export interface APIOptionsMap {
+  [key: string]: any
+}
+
 type parser = {
   parse(OutputData: OutputData): Array<string>;
-  parseAsync(OutputData: OutputData): Promise<string[]>;
+  parseAsync(OutputData: OutputData, apiOptions: APIOptionsMap): Promise<string[]>;
   parseStrict(OutputData: OutputData): Array<string> | Error;
   parseBlock(block: block): string;
   validate(OutputData: OutputData): Array<string>;
@@ -23,10 +27,10 @@ const parser = (plugins = {}): parser => {
       });
     },
 
-    parseAsync: async ({ blocks }) => {
+    parseAsync: async ({ blocks }, apiOptions) => {
       return await BluebirdPromise.map(blocks, async (block) => {
         return parsers[block.type]
-          ? (await parsers[block.type](block))
+          ? (await parsers[block.type](block, apiOptions))
           : ParseFunctionError(block.type);
       });
     },
